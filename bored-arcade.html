@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>BORED? — Games for Bored Designers</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230C0C11'/%3E%3Ctext x='32' y='45' font-family='Arial Black,sans-serif' font-size='32' font-weight='900' text-anchor='middle' fill='%23C6F432'%3EB%3F%3C/text%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Anton&family=Space+Grotesk:wght@400;500;700&family=Abril+Fatface&family=Bebas+Neue&family=Courier+Prime&family=Inter&family=Lato&family=Lobster&family=Lora&family=Merriweather&family=Montserrat&family=Open+Sans&family=Oswald&family=Pacifico&family=Playfair+Display&family=Poppins&family=Raleway&family=Righteous&family=Roboto&family=Roboto+Slab&family=Rubik&family=Space+Mono&family=Work+Sans&display=swap" rel="stylesheet">
 <style>
@@ -492,7 +493,7 @@ kbd{background:#fff;color:var(--ink);border:none;border-radius:7px;padding:3px 8
       </div>
       <div class="card c-gif" data-go="cookie">
         <span class="num">07</span>
-        <div><h2>Lucky Cookie</h2><p>One designer prophecy every 5 minutes. Crack it open.</p></div>
+        <div><h2>Lucky Cookie</h2><p>One designer prophecy per day. Crack it open.</p></div>
         <span class="go">Crack →</span>
       </div>
       <div class="card c-type" data-go="type">
@@ -584,7 +585,7 @@ kbd{background:#fff;color:var(--ink);border:none;border-radius:7px;padding:3px 8
   <div class="wrap">
     <div class="game-head">
       <h1>Studio Picker</h1>
-      <p>Full HSL control, zero excuses. Rebuild the requested relationship — complement, analogous, triadic, tetradic or a straight match — before the bar drains.</p>
+      <p>One job: rebuild the exact color you're shown, with full HSL control, before the bar drains. Sounds easy. Your eyes will disagree.</p>
     </div>
     <div class="hud">
       <div class="chip big">Mode <b id="stuMode">MATCH</b></div>
@@ -616,7 +617,7 @@ kbd{background:#fff;color:var(--ink);border:none;border-radius:7px;padding:3px 8
     <div class="controls">
       <button class="btn dark" id="colorLockS">Lock it in</button>
       <button class="btn" id="colorNextS" style="display:none">Next round →</button>
-      <span class="tag" style="color:#fff">Answers follow the artist's (RYB) color wheel · 20 seconds before it auto-locks</span>
+      <span class="tag" style="color:#fff">Match the color exactly · 20 seconds before it auto-locks</span>
     </div>
     <div class="result" id="colorResultS"></div>
   </div>
@@ -732,7 +733,7 @@ kbd{background:#fff;color:var(--ink);border:none;border-radius:7px;padding:3px 8
   <div class="wrap">
     <div class="game-head">
       <h1>Lucky Cookie</h1>
-      <p>One fortune cookie every five minutes. Crack it open for a 100% accurate* designer prophecy. <em>*accuracy not guaranteed, refunds not available</em></p>
+      <p>One fortune cookie per day. Crack it open for a 100% accurate* designer prophecy. <em>*accuracy not guaranteed, refunds not available</em></p>
     </div>
     <div class="hud">
       <div class="chip">Cookies cracked <b id="ckCount">0</b></div>
@@ -751,7 +752,7 @@ kbd{background:#fff;color:var(--ink);border:none;border-radius:7px;padding:3px 8
     </div>
     <div class="controls">
       <button class="btn dark" id="ckShare">Share fortune</button>
-      <span class="tag" style="color:rgba(12,12,17,.6)">3 whacks to crack · one cookie per 5 minutes</span>
+      <span class="tag" style="color:rgba(12,12,17,.6)">3 whacks to crack · one cookie per day</span>
     </div>
   </div>
 </section>
@@ -1265,10 +1266,6 @@ function showResult(el,score,detail){
   const lockBtn=$('#colorLockS'), nextBtn=$('#colorNextS');
   const MODES=[
     {id:'MATCH',label:'Match this color',hues:[0]},
-    {id:'COMPLEMENTARY',label:'Pick its complement',hues:[180]},
-    {id:'ANALOGOUS',label:'Pick an analogous color (±30°)',hues:[30,-30]},
-    {id:'TRIADIC',label:'Pick a triadic partner (±120°)',hues:[120,-120]},
-    {id:'TETRADIC',label:'Pick a tetradic partner (90°)',hues:[90,180,270]},
   ];
   const T=20;
   let mode=MODES[0], targetC=null, pick={h:180,s:.7,l:.5}, locked=false;
@@ -1726,6 +1723,7 @@ function showResult(el,score,detail){
     {name:'LIGHTNING',nodes:7,d:'M430,60 L320,250 L390,250 L340,400 L500,210 L425,210 L490,60 Z'},
     {name:'STAR',nodes:10,d:'M400,70 L441,183 L562,188 L467,262 L500,378 L400,310 L300,378 L333,262 L238,188 L359,183 Z'},
   ];
+  SHAPES.sort(()=>Math.random()-.5); // fresh order every visit
   let si=0, shape=SHAPES[0], anchors=[], dragging=false, closed=false, scores=[], started=false, editing=null;
 
   function svgPt(e){
@@ -1904,10 +1902,43 @@ function showResult(el,score,detail){
     'A junior will ask for your feedback. You are the senior now.',
     'Your side project will remain beautifully unfinished. As intended.',
     'White space will win the argument for you.',
-    'Someone will say "trust the process" and, for once, the process will deserve it.'
+    'Someone will say "trust the process" and, for once, the process will deserve it.',
+    'Your layers will be so perfectly organized that another designer will shed a tear.',
+    'The stock photo you find on the first page will actually have the correct lighting and expression.',
+    'You will press "Export" and the progress bar will not stall at 99%.',
+    'An auto-save file will emerge from the ashes of a sudden crash, intact and beautiful.',
+    'You will delete an unused asset folder and your project file size will instantly drop by 2GB.',
+    'A stakeholder will ask to "see it in green," only to realize you were right the first time.',
+    'The feedback document will contain zero screenshots of Word documents.',
+    '"I\'ll know it when I see it" will actually be followed by them seeing it and knowing it.',
+    'A client will write "no notes" and it will not be a trap.',
+    'The person reviewing your layout will actually view it at 100% zoom.',
+    'You will perfectly judge white space on the first try, leaving no room for executive doubt.',
+    'A developer will proactively ask you about the hover state before guessing wildly.',
+    'The font you\'ve been eyeing all year will suddenly go on a 90% flash sale.',
+    'You will successfully explain what you do for a living to a relative, and they will understand.',
+    'Your favorite hex code will look just as good in print as it does on your screen.',
+    'The client will accidentally view the presentation in the correct aspect ratio.',
+    'You will select the exact right layer on the first click, without digging through three nested groups.',
+    'A developer will spot an unaligned element and fix it without you having to file a ticket.',
+    'The "as per my previous email" you draft will remain in your head, but the universe will deliver justice anyway.',
+    'You will drop a color picker on a blurry JPEG and somehow hit the exact primary hex code.',
+    'Your laptop fans will remain completely silent during a screen-share presentation.',
+    'The feedback "can we make it feel more organic?" will be solved by adding exactly one drop shadow.',
+    'A stakeholder will praise your use of negative space instead of trying to fill it with a button.',
+    'You will use a trendy new typeface and it will still look clean six months from now.',
+    'The copywriting team will deliver text that fits the character count perfectly on the first draft.',
+    'You will close twenty open tabs and your browser will thank you by not crashing.',
+    'The budget will mysteriously increase to match the scope of the original concept.',
+    'You will find the exact vector icon you need without having to download a shady zip file.',
+    'A client will point to the screen and say, "Actually, let\'s go back to concept one."',
+    'Your favorite shortcut key will never lag, stick, or betray you.',
+    'The hex code you guess off the top of your head will be exactly the color they wanted.',
+    'You will successfully convert a client from a Word doc workflow to a collaborative link.',
+    'Someone will compliment the kerning on a subheadline you spent way too long adjusting.'
   ];
   const wrap=$('#ckWrap'), crack=$('#ckCrack'), slip=$('#ckSlip'), txt=$('#ckText'), hint=$('#ckHint');
-  const COOL=5*60*1000;
+  function nextMidnight(){const t=new Date();t.setHours(24,0,0,0);return t.getTime();}
   let clicks=0, count=0, broken=false, current='';
   let nextAt=0;
   try{nextAt=+(localStorage.getItem('ckNext')||0);}catch(e){}
@@ -1930,7 +1961,7 @@ function showResult(el,score,detail){
   function reShake(){wrap.classList.remove('shake');void wrap.offsetWidth;wrap.classList.add('shake');}
   wrap.addEventListener('click',()=>{
     if(broken)return;
-    if(!ready()){reShake();hint.textContent='Still baking. Patience, designer.';return;}
+    if(!ready()){reShake();hint.textContent='One per day. The universe has limits.';return;}
     clicks++; sfx.crunch(); reShake();
     crack.style.opacity=1;
     crack.style.strokeDashoffset=String(Math.max(0,400-clicks*140));
@@ -1944,9 +1975,9 @@ function showResult(el,score,detail){
       crumbs(24,130);
       setTimeout(()=>{slip.classList.add('show');sfx.good();},380);
       count++; const cc=$('#ckCount'); cc.textContent=count; bump(cc.parentElement);
-      nextAt=Date.now()+COOL;
+      nextAt=nextMidnight(); // one cookie per day
       try{localStorage.setItem('ckNext',String(nextAt));}catch(e){}
-      hint.textContent='Fortune received. A new cookie is baking…';
+      hint.textContent='Fortune received. Next cookie at midnight.';
     }else{
       hint.textContent=clicks===1?'It\'s cracking…':'One more good whack!';
     }
@@ -1965,11 +1996,12 @@ function showResult(el,score,detail){
     if(currentView!=='cookie')return;
     if(!ready()){
       const s=Math.ceil((nextAt-Date.now())/1000);
+      const h=Math.floor(s/3600), mm=Math.floor(s%3600/60), ss=s%60;
       $('#ckTimerChip').style.display='';
-      $('#ckTimer').textContent=Math.floor(s/60)+':'+String(s%60).padStart(2,'0');
+      $('#ckTimer').textContent=(h?h+':':'')+String(mm).padStart(2,'0')+':'+String(ss).padStart(2,'0');
       if(!broken&&!wrap.classList.contains('cooldown')){
         wrap.classList.add('cooldown');wrap.classList.remove('idle');
-        hint.textContent='Your next cookie is still baking…';
+        hint.textContent='Today\'s cookie is spent. Come back tomorrow.';
       }
     }else if(broken||wrap.classList.contains('cooldown')){
       resetCookie();
@@ -2186,11 +2218,11 @@ function showResult(el,score,detail){
     shape.pts.forEach(([x,y],i)=>ctx[i?'lineTo':'moveTo'](cx+x,cy+y));
     ctx.closePath();
     ctx.fillStyle=shape.c;ctx.fill();
-    // dot — literally a dot
-    ctx.beginPath();ctx.arc(cx+off.x,cy+off.y,3,0,7);
+    // dot — LITERALLY a dot
+    ctx.beginPath();ctx.arc(cx+off.x,cy+off.y,2,0,7);
     ctx.fillStyle='#0C0C11';ctx.fill();
-    ctx.beginPath();ctx.arc(cx+off.x,cy+off.y,3.8,0,7);
-    ctx.strokeStyle='#fff';ctx.lineWidth=1.4;ctx.stroke();
+    ctx.beginPath();ctx.arc(cx+off.x,cy+off.y,2.7,0,7);
+    ctx.strokeStyle='#fff';ctx.lineWidth=1;ctx.stroke();
     if(reveal){
       const hh=shape.h/2;
       ctx.strokeStyle='rgba(12,12,17,.5)';ctx.lineWidth=1.5;ctx.setLineDash([6,5]);
@@ -2249,6 +2281,7 @@ function showResult(el,score,detail){
       {x:385,y:385,in:{x:478,y:350},out:{x:308,y:412}},
       {x:248,y:295,in:{x:242,y:372},out:null}]}
   ];
+  LETTERS.sort(()=>Math.random()-.5); // fresh order every visit
   let li=0,letter=null,anchors=[],broken=[],dragH=null,locked=false,scores=[],started=false;
 
   function clone(o){return JSON.parse(JSON.stringify(o));}
