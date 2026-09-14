@@ -137,6 +137,7 @@ nav{
 .chip b{font-family:"Anton",sans-serif;font-weight:400;font-size:15px;letter-spacing:.02em}
 .chip.big b{font-size:19px}
 .chip.bump{animation:bump .45s var(--spring)}
+.chip-sub{font-size:10px;opacity:.55;text-transform:none;letter-spacing:0;font-weight:600;font-family:"Space Grotesk",sans-serif}
 @keyframes bump{0%{transform:scale(1)}35%{transform:scale(1.14)}100%{transform:scale(1)}}
 
 /* stage panels */
@@ -544,10 +545,10 @@ kbd{background:#fff;color:var(--ink);border:none;border-radius:7px;padding:3px 8
   <div class="wrap">
     <div class="game-head">
       <h1>Pixel Perfect</h1>
-      <p>Draw the requested size — at the given scale — by pure eyeball. Drag on the canvas, redraw as much as you like, then lock it in.</p>
+      <p>Draw the exact pixel box shown — by pure eyeball. Drag on the canvas, redraw as much as you like, then lock it in.</p>
     </div>
     <div class="hud">
-      <div class="chip big" id="dimTargetChip">Draw <b id="dimTarget">—</b></div>
+      <div class="chip big" id="dimTargetChip">Draw <b id="dimTarget">—</b><span class="chip-sub" id="dimSub"></span></div>
       <div class="chip">Round <b id="dimRound">1</b></div>
       <div class="chip">Avg accuracy <b id="dimAvg">—</b></div>
       <div class="chip">Best <b id="dimBest">—</b></div>
@@ -1054,13 +1055,24 @@ $$('.view:not(#view-lobby) .wrap').forEach(w=>{
     locked=false; rect=null;
     $('#dimResult').classList.remove('show');
     // pick a size+scale combo that fits nicely
+    target=null;
     for(let i=0;i<200;i++){
       const s=sizes[Math.random()*sizes.length|0];
       const sc=scales[Math.random()*scales.length|0];
       const w=s[0]*sc, h=s[1]*sc;
       if(w<=cw*0.85 && h<=ch*0.85 && w>=50 && h>=20){ target=s; scale=sc; expW=w; expH=h; break; }
     }
-    $('#dimTarget').textContent=target[0]+' × '+target[1]+' @ '+(scale*100)+'%';
+    // guaranteed fallback: canvas wasn't laid out yet (cw/ch still 0) or nothing fit in 200 tries —
+    // compute a scale that fits this exact canvas so target is NEVER left null
+    if(!target){
+      const s=sizes[Math.random()*sizes.length|0];
+      const safeCw=cw||300, safeCh=ch||300;
+      const fit=Math.min(1,(safeCw*0.85)/s[0],(safeCh*0.85)/s[1]);
+      const sc=Math.max(0.05,Math.round(fit*100)/100);
+      target=s; scale=sc; expW=s[0]*sc; expH=s[1]*sc;
+    }
+    $('#dimTarget').textContent=Math.round(expW)+' × '+Math.round(expH)+'px';
+    $('#dimSub').textContent='('+target[0]+'×'+target[1]+' doc @ '+(scale*100)+'% zoom)';
     $('#dimRound').textContent=round;
     draw();
   }
@@ -1084,7 +1096,7 @@ $$('.view:not(#view-lobby) .wrap').forEach(w=>{
       ctx.strokeRect(rect.x,rect.y,expW,expH);
       ctx.fillStyle='#00B385';
       ctx.font='700 13px "Space Grotesk"';
-      ctx.fillText('ACTUAL '+Math.round(expW)+'×'+Math.round(expH)+'px',rect.x+4,rect.y-8<12?rect.y+expH+18:rect.y-8);
+      ctx.fillText('TARGET '+Math.round(expW)+'×'+Math.round(expH)+'px',rect.x+4,rect.y-8<12?rect.y+expH+18:rect.y-8);
       ctx.fillStyle='#101014';
       ctx.fillText('YOURS '+Math.round(rect.w)+'×'+Math.round(rect.h)+'px',rect.x+4,rect.y+rect.h+18);
     }
@@ -1623,7 +1635,7 @@ $$('.view:not(#view-lobby) .wrap').forEach(w=>{
     lockBtn.style.display='';nextBtn.style.display='none';
     $('#kernResult').classList.remove('show');
     const word=words[wi];
-    const stageW=stage.clientWidth*0.86;
+    const stageW=(stage.clientWidth||500)*0.86;
     let m=measure(word,150);
     fs=Math.min(150,150*stageW/m.total);
     m=measure(word,fs);
@@ -2089,8 +2101,10 @@ $$('.view:not(#view-lobby) .wrap').forEach(w=>{
   function board(){
     clearTiles();
     const cfg=DIFF[diff];
-    const w=stage.clientWidth, h=stage.clientHeight-14;
-    const cols=Math.ceil(Math.sqrt(cfg.n*w/h)), rows=Math.ceil(cfg.n/cols);
+    // guard against a not-yet-laid-out stage (0 width/height) — without these
+    // clamps cols/rows can come out as 0/Infinity and freeze the tab in an infinite loop
+    const w=stage.clientWidth||600, h=(stage.clientHeight||460)-14;
+    const cols=Math.max(1,Math.ceil(Math.sqrt(cfg.n*w/h))), rows=Math.max(1,Math.ceil(cfg.n/cols));
     const cw=w/cols, chh=h/rows;
     const cells=[];
     for(let r=0;r<rows;r++)for(let c=0;c<cols;c++)cells.push([c,r]);
@@ -2381,7 +2395,9 @@ $$('.view:not(#view-lobby) .wrap').forEach(w=>{
 
   function init(){
     dpr=devicePixelRatio||1;
-    const w=cv.clientWidth,h=cv.clientHeight;
+    // fallback to a sane default if the canvas isn't laid out yet (0 width/height) —
+    // otherwise the internal buffer ends up 0px and getImageData() throws on the first stroke
+    const w=cv.clientWidth||600,h=cv.clientHeight||460;
     let old=null;
     if(inited)old=document.createElement('canvas'),old.width=cv.width,old.height=cv.height,old.getContext('2d').drawImage(cv,0,0);
     cv.width=w*dpr;cv.height=h*dpr;
